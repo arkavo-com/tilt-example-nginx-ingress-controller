@@ -1,0 +1,48 @@
+# etheria Tiltfile for development
+# https://docs.tilt.dev/api.html
+
+# extensions
+# https://github.com/tilt-dev/tilt-extensions
+load('ext://helm_remote', 'helm_remote')
+load('ext://namespace', 'namespace_yaml')
+
+# namespace
+k8s_yaml(namespace_yaml('ingress-nginx'))
+k8s_yaml(namespace_yaml('ns0'))
+k8s_yaml(namespace_yaml('ns1'))
+k8s_yaml(namespace_yaml('ns2'))
+
+# ingress
+#k8s_yaml('ingress-service.yaml')
+#k8s_yaml('ingress.yaml')
+
+# helm remote resources
+# https://github.com/kubernetes/ingress-nginx
+helm_remote('ingress-nginx', namespace='ingress-nginx', repo_url='https://kubernetes.github.io/ingress-nginx')
+# https://github.com/Ealenn/Echo-Server
+helm_remote('echo-server', namespace='ns0', release_name='ns0', repo_url='https://ealenn.github.io/charts', values=['ns0-echo-server-values.yaml'])
+helm_remote('echo-server', namespace='ns1', release_name='ns1', repo_url='https://ealenn.github.io/charts', values=['ns1-echo-server-values.yaml'])
+helm_remote('echo-server', namespace='ns2', release_name='ns2', repo_url='https://ealenn.github.io/charts', values=['ns2-echo-server-values.yaml'])
+
+# make a new resource consisting of some objects necessary for cluster setup
+k8s_resource(
+  new_name='ingress',
+  objects=[
+#      'tn-ingress:Ingress:ingress-nginx',
+#      'nginx:IngressClass:default',
+      'ns0-echo-server:Ingress:ns0',
+      'ns1-echo-server:Ingress:ns1',
+      'ns2-echo-server:Ingress:ns2',
+      ],
+  resource_deps=['ingress-nginx-controller']
+)
+#
+
+# port forward
+k8s_resource('ingress-nginx-controller', port_forwards='8080:80')
+
+# additional links
+k8s_resource('ingress-nginx-controller', links=[
+    link('http://localhost:8080/echo1'),
+    link('http://localhost:8080/echo2')
+])

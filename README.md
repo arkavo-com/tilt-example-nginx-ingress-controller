@@ -31,12 +31,18 @@ https://kubernetes.github.io/ingress-nginx/deploy/
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.0/deploy/static/provider/cloud/deploy.yaml
 ```
 
+Free port 8080 or change in `Tilefile`
+
 ## Execute
+
+### base
+
+in directory 0-base
 
 `tilt up`
 
 hit (space) to open the browser  
-click links under `ingress-nginx-controller`
+click links to services under `ingress-nginx-controller`
 
 ## Troubleshoot
 
@@ -54,9 +60,14 @@ cluster dump
 kubectl cluster-info dump
 ```
 
-ingress inforomation
+ingress information
 ```shell
 kubectl get services -n ingress-nginx
 kubectl get ingress -n ingress-nginx
 nginx -T
 ```
+
+Error in `ingress` resource  
+`Build Failed: kubernetes apply: Internal error occurred: failed calling webhook "validate.nginx.ingress.kubernetes.io": Post "https://ingress-nginx-controller-admission.ingress-nginx.svc:443/networking/v1/ingresses?timeout=10s": x509: certificate signed by unknown authority`  
+Solution  
+cause unknown, seems benign; restart resource

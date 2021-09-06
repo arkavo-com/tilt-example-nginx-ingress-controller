@@ -1,0 +1,16 @@
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hosts:
+    - host: localhost
+      paths:
+        - /echo1(/|$)(.*)
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+application:
+  logs:
+    ignore:
+      ping: true
